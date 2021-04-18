@@ -2,45 +2,6 @@
 include('database.php');
 include('utility.php');
 
-// Function to login user
-function loginUser() {
-    $return_val = array(
-        'result' => true,
-        'err'    => "",
-    );
-
-    if (empty($_POST["name"]) || empty($_POST["pass"])) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Please fill data";
-        return $return_val;
-    }
-
-    $name = $_POST["name"];
-    $pass = $_POST["pass"];
-
-    $conn = connectToDB();
-    if (!$conn) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Connection to database failed.";
-        return $return_val;
-    }
-
-    // SQL DB
-    $sql = "SELECT name, hash, FROM users WHERE name='$name'";
-    $result = $conn->query($sql);
-    if ($result && $result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        if (password_verify($name . $pass, $row["hash"])) {
-            $return_val['hash'] = $row["hash"];
-            return $return_val;
-        }
-    }
-
-    $return_val['result'] = false;
-    $return_val['err'] = "*Wrong username or password";
-    return $return_val;
-}
-
 // Function to register user
 function registerUser() {
     // Return value
@@ -63,6 +24,12 @@ function registerUser() {
     $avatar = $_POST["avatar"];
     $email = $_POST["email"];
 
+    $hash = $_POST['hash'];
+    if (!verifyUser($hash)) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Permission Denied";
+        return $return_val;
+    }
 
     if ($name == false) {
         $return_val['result'] = false;
@@ -218,6 +185,12 @@ function updateUser() {
     $avatar = $_POST["avatar"];
     $email = $_POST["email"];
 
+    $hash = $_POST['hash'];
+    if (!verifyUser($hash)) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Permission Denied";
+        return $return_val;
+    }
 
     $conn = connectToDB();
     if (!$conn) {
@@ -255,10 +228,6 @@ if (empty($_POST["type"])) {
 $type = $_POST["type"];
 
 switch ($type) {
-case 'login':
-    echo json_encode(loginUser());
-    break;
-
 case 'register':
     echo json_encode(registerUser());
     break;

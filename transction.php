@@ -10,6 +10,14 @@ function addTransaction() {
         'err'    => "",   // err msg
         'pass_err' => ""  // wrong pass err msg
     );
+
+    $hash = $_POST['hash'];
+    if (!verifyUser($hash)) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Permission Denied";
+        return $return_val;
+    }
+
     // Logger
     $logger = new Logger();
 
