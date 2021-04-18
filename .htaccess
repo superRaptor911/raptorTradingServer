@@ -1,0 +1,17 @@
+php_value error_log logs/all_errors.log
+php_value upload_max_filesize 400M
+php_value post_max_size 420M
+<IfModule mod_headers.c>
+    Header add Access-Control-Allow-Origin "*"
+    Header add Access-Control-Allow-Methods "GET,PUT,POST,DELETE"
+    Header add Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /index.html [L]
+</IfModule>
