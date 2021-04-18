@@ -3,8 +3,8 @@ include('logger.php');
 
 function connectToDB() {
     $servername = "localhost";
-    $username = "raptor";
-    $password = "intel8086";
+    $username = "my_fcuking_username";
+    $password = "my_fcuking_db_password";
     $db = "cucekTrading";
 
     $conn = new mysqli($servername, $username, $password, $db);
@@ -30,7 +30,7 @@ function showInvalidRequest($msg = "") {
 
 // Function to verify user using name and pass
 function verifyUser($hash) {
-    return $hash == "my_fucking_password";
+    return $hash == "my_fcuking_admin_password";
 }
 
 ?>

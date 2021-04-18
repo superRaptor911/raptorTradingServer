@@ -1,5 +1,6 @@
+-- RUN THESE COMMANDS IN UR SQL DB
 create database cucekTrading;
-GRANT ALL PRIVILEGES ON cucekTrading.* TO 'raptor'@'localhost';
+GRANT ALL PRIVILEGES ON cucekTrading.* TO 'my_fcuking_username'@'localhost';
 FLUSH PRIVILEGES;
 USE cucekTrading;
 CREATE TABLE users(
@@ -26,17 +27,12 @@ CREATE TABLE userCoins (
     trxinr INT(6) DEFAULT 0,
     FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
--- Donot run
+-- RUN THIS TOO
 ALTER TABLE transactions ADD FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE transactions ADD FOREIGN KEY (coin) REFERENCES coins(name) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE transactions ADD COLUMN transType VARCHAR(10) DEFAULT 'DEPOSIT';
-/* ALTER TABLE userCoins ADD FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE; */
-
-
--- LOCAL
-ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-/* SHOW CREATE TABLE transactions\G; */
-/* ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_1; */
-/* ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_2; */
+-----------------------------------------------------------------------------
+-- ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- SHOW CREATE TABLE transactions\G;
+-- ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_1;
+-- ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_2;
