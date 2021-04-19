@@ -124,6 +124,42 @@ function getTransactionInfo() {
     return $return_val;
 }
 
+function getInvestmentsProfits() {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+        'trans'  => Array()
+    );
+
+    $conn = connectToDB();
+    if (!$conn) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Connection to database failed.";
+        return $return_val;
+    }
+
+    $sql = "SELECT i.*, u.avatar AS userAvatar FROM investments i
+            LEFT JOIN
+                users u ON i.username = u.name ";
+    
+    $investments = array();
+
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error failed to get";
+        return $return_val;
+    }
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            array_push($investments, $row);
+        }
+    }
+
+    return $return_val;
+}
+
 // ------------------Execution starts here-----------------
 $_POST = json_decode(file_get_contents('php://input'), true);
 if (empty($_POST["type"])) {
@@ -143,6 +179,10 @@ switch ($type) {
 
     case 'info':
         echo json_encode(getTransactionInfo());
+        break;
+
+    case 'investments':
+        echo json_encode(getInvestmentsProfits());
         break;
 
     default:
