@@ -32,13 +32,22 @@ CREATE TABLE investments(
     investment INT(6) DEFAULT 0,
     FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
 );
--- RUN THIS TOO
+CREATE TABLE wallet (
+    username varchar(64),
+    amount FLOAT(24),
+    FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
+);
+-- RUN THESE TOO
 ALTER TABLE transactions ADD FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE transactions ADD FOREIGN KEY (coin) REFERENCES coins(name) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE transactions ADD COLUMN transType VARCHAR(10) DEFAULT 'DEPOSIT';
+--
 ALTER TABLE transactions DROP COLUMN transType;
 ALTER TABLE transactions ADD COLUMN transStatus BOOLEAN DEFAULT 1;
 ALTER TABLE transactions ADD COLUMN transType BOOLEAN DEFAULT 1;
+--
+ALTER TABLE investments MODIFY COLUMN investment FLOAT(24) DEFAULT 0.0;
+ALTER TABLE transactions MODIFY COLUMN cost FLOAT(24);
 -----------------------------------------------------------------------------
 -- ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- SHOW CREATE TABLE transactions\G;
