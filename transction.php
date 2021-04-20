@@ -124,12 +124,12 @@ function getTransactionInfo() {
     return $return_val;
 }
 
-function getInvestmentsProfits() {
+function getInvestmentsPlusCoins() {
     // Return value
     $return_val = array(
         'result' => true, // success
         'err'    => "",   // err msg
-        'trans'  => Array()
+        'data'  => Array()
     );
 
     $conn = connectToDB();
@@ -139,24 +139,58 @@ function getInvestmentsProfits() {
         return $return_val;
     }
 
+    // Get Investment data
     $sql = "SELECT i.*, u.avatar AS userAvatar FROM investments i
             LEFT JOIN
                 users u ON i.username = u.name ";
     
     $investments = array();
-
     $result = $conn->query($sql);
     if (!$result) {
         $return_val['result'] = false;
-        $return_val['err'] = "Error failed to get";
+        $return_val['err'] = "SQL ERROR: " .$conn->error;
         return $return_val;
     }
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            array_push($investments, $row);
+            $investments[$row["username"]] = $row;
         }
     }
 
+    $finalData = array();
+    // Get coins
+    $sql = "SELECT * FROM userCoins";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "SQL ERROR: " .$conn->error;
+        return $return_val;
+    }
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $data = array();
+            $coins = array();
+            $username = $row['username'];
+            $investment = $investments["$username"]["investment"];
+            $userAvatar = $investments["$username"]["userAvatar"];
+
+            foreach ($row as $key => $count) {
+                if ($key != "username" && $count != 0) {
+                    array_push($coins, array("coin" => $key, "count" => $count));
+                }
+            }
+
+            $data = array(
+                "username" => $username,
+                "userAvatar" => $userAvatar,
+                "investment" => $investment,
+                "coins" => $coins
+            );
+            array_push($finalData, $data);
+        }
+    }
+
+    $return_val["data"] = $finalData;
     return $return_val;
 }
 
@@ -181,8 +215,8 @@ switch ($type) {
         echo json_encode(getTransactionInfo());
         break;
 
-    case 'investments':
-        echo json_encode(getInvestmentsProfits());
+    case 'investmentNcoins':
+        echo json_encode(getInvestmentsPlusCoins());
         break;
 
     default:

@@ -36,6 +36,9 @@ CREATE TABLE investments(
 ALTER TABLE transactions ADD FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE transactions ADD FOREIGN KEY (coin) REFERENCES coins(name) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE transactions ADD COLUMN transType VARCHAR(10) DEFAULT 'DEPOSIT';
+ALTER TABLE transactions DROP COLUMN transType;
+ALTER TABLE transactions ADD COLUMN transStatus BOOLEAN DEFAULT 1;
+ALTER TABLE transactions ADD COLUMN transType BOOLEAN DEFAULT 1;
 -----------------------------------------------------------------------------
 -- ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- SHOW CREATE TABLE transactions\G;
