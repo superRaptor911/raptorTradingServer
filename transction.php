@@ -124,6 +124,42 @@ function getTransactionInfo() {
     return $return_val;
 }
 
+
+function getWalletInfo() {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+        'wallet'  => Array()
+    );
+
+    $username = $_POST["username"];
+
+    $conn = connectToDB();
+    if (!$conn) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Connection to database failed.";
+        return $return_val;
+    }
+
+    $sql = "SELECT * FROM wallet
+        WHERE username= '$username'";
+
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error failed to get";
+        return $return_val;
+    }
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $return_val['wallet'] = $row;
+    }
+
+    return $return_val;
+}
+
+
 function getInvestmentsPlusCoins() {
     // Return value
     $return_val = array(
@@ -215,10 +251,10 @@ function transferFund() {
         return $return_val;
     }
 
-    $type = $_POST["type"];
     $username = $_POST["username"];
     $amount = $_POST["amount"];
     $transtype = $_POST["transtype"];
+    $fee = $_POST["fee"];
 
     $conn = connectToDB();
     if (!$conn) {
@@ -263,12 +299,22 @@ function transferFund() {
         return $return_val;
     }
 
+    // Add history
+    $sql = "INSERT INTO fundTransferHistory(username, amount, transType, fee)
+            VALUES('$username', $amount, $transtype, $fee)";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "SQL ERROR: " .$conn->error;
+        return $return_val;
+    }
+
+    // Update Wallet
     $sql = "UPDATE wallet 
         SET
             amount=$curBalance
         WHERE
             username='$username'";
-
     $result = $conn->query($sql);
     if (!$result) {
         $return_val['result'] = false;
@@ -298,6 +344,10 @@ switch ($type) {
 
     case 'info':
         echo json_encode(getTransactionInfo());
+        break;
+
+    case 'walletInfo':
+        echo json_encode(getWalletInfo());
         break;
 
     case 'investmentNcoins':
