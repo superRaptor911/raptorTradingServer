@@ -61,6 +61,44 @@ function registerUser() {
     return $return_val;
 }
 
+
+function createTables($username) {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+    );
+
+    $conn = connectToDB();
+    if (!$conn) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Connection to database failed.";
+        return $return_val;
+    }
+
+    $sql = "INSERT INTO wallet(username, amount) VALUES('$username', 0)";
+    if (!$conn->query($sql)) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error :" . $conn->error;
+        return $return_val;
+    }
+
+    $sql = "INSERT INTO userCoins(username) VALUES('$username')";
+    if (!$conn->query($sql)) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error :" . $conn->error;
+        return $return_val;
+    }
+
+    $sql = "INSERT INTO investments(username) VALUES('$username')";
+    if (!$conn->query($sql)) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error :" . $conn->error;
+        return $return_val;
+    }
+    return $return_val;
+}
+
 function getUserInfo() {
     // Return value
     $return_val = array(

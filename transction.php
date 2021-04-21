@@ -36,10 +36,17 @@ function addTransaction() {
     $fee = $_POST["fee"];
     $transtype = $_POST["transtype"];
     $hash = $_POST["hash"];
+    
+    $_POST["externalTransfer"] = 0;
 
     // Switch transfer type 
     if ($transtype == 0) {
+        // Sell coin
         $_POST["transtype"] = 1;
+        $result = transferCoins($username, $coinName, $coinCount, $transtype);
+        if ($result['result'] == false) {
+            return $result;
+        }
     }
     else {
         $_POST["transtype"] = 0;
@@ -70,6 +77,11 @@ function addTransaction() {
         return $return_val;
     }
 
+    // Add coins
+    if ($transtype == 1) {
+        return transferCoins($username, $coinName, $coinCount, $transtype);
+    }
+
     return $return_val;
 }
 
@@ -88,7 +100,7 @@ function transferFund() {
         return $return_val;
     }
 
-    if (empty($_POST["username"]) || empty($_POST["amount"]) || !isset($_POST["transtype"])) {
+    if (empty($_POST["username"]) || empty($_POST["amount"]) || !isset($_POST["transtype"]) || !isset($_POST["externalTransfer"])) {
         $return_val['result'] = false;
         $return_val['err'] = "Please Fill Fields";
         return $return_val;
@@ -97,6 +109,7 @@ function transferFund() {
     $username = $_POST["username"];
     $amount = $_POST["amount"];
     $transtype = $_POST["transtype"];
+    $externalTransfer = $_POST["externalTransfer"];
     $fee = $_POST["fee"];
 
     $conn = connectToDB();
@@ -145,8 +158,8 @@ function transferFund() {
     $curBalance -= $fee;
 
     // Add history
-    $sql = "INSERT INTO fundTransferHistory(username, amount, transType, fee, time)
-        VALUES('$username', $amount, $transtype, $fee, NOW())";
+    $sql = "INSERT INTO fundTransferHistory(username, amount, transType, fee, externalTransfer, time)
+        VALUES('$username', $amount, $transtype, $fee, $externalTransfer, NOW())";
     $result = $conn->query($sql);
     if (!$result) {
         $return_val['result'] = false;
@@ -164,6 +177,90 @@ function transferFund() {
     if (!$result) {
         $return_val['result'] = false;
         $return_val['err'] = "SQL ERROR: " .$conn->error;
+        return $return_val;
+    }
+
+    // Modify investment table if external investment
+    if ($externalTransfer == 1) {
+        if ($transtype == 0) {
+            $amount = -1 * $amount;
+        }
+
+        $sql = "UPDATE investments
+            SET investment = investment + $amount 
+            WHERE username = '$username'";
+
+        $result = $conn->query($sql);
+        if (!$result) {
+            $return_val['result'] = false;
+            $return_val['err'] = "SQL ERROR: " .$conn->error;
+            return $return_val;
+        }
+    }
+
+    return $return_val;
+}
+
+function transferCoins($username, $coinName, $coinCount, $transtype) {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+    );
+
+    // GET COIN count
+    $conn = connectToDB();
+    if (!$conn) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Connection to database failed.";
+        return $return_val;
+    }
+
+    // GET user wallet
+    $sql = "SELECT uc.*, c.id FROM userCoins uc 
+        LEFT JOIN
+            coins c ON c.name = '$coinName'
+        WHERE uc.username='$username'";
+
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error failed to get";
+        return $return_val;
+    }
+    if ($result->num_rows != 1) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error failed to get coin count";
+        return $return_val;
+    }
+
+    $row = $result->fetch_assoc();
+    $coinId = $row['id'];
+    $coinsLeft = $row["$coinId"]; 
+
+    if ($transtype == 0) {
+        $coinsLeft = $coinsLeft - $coinCount;
+        if ($coinsLeft < 0) {
+            $return_val['result'] = false;
+            $return_val['err'] = "You dont have enough coins to sell!";
+            return $return_val;
+        }
+    }
+    else {
+        $coinsLeft = $coinsLeft + $coinCount;
+    }
+
+    // Update coins
+    $sql = "UPDATE userCoins
+        SET 
+            $coinId = $coinsLeft
+        WHERE
+            username='$username'";
+
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error failed to update coins " . $conn->error;
         return $return_val;
     }
 
@@ -353,6 +450,42 @@ function getInvestmentsPlusCoins() {
     return $return_val;
 }
 
+function getFundTransferHistory() {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+        'history'  => Array()
+    );
+
+    $username = $_POST["username"];
+
+    $conn = connectToDB();
+    if (!$conn) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Connection to database failed.";
+        return $return_val;
+    }
+
+    $sql = "SELECT f.*, u.avatar AS userAvatar FROM fundTransferHistory f
+        LEFT JOIN
+        users u ON u.name = '$username'
+        WHERE username= '$username'";
+
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error failed to get";
+        return $return_val;
+    }
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            array_push($return_val['history'], $row);
+        }
+    }
+
+    return $return_val;
+}
 
 // ------------------Execution starts here-----------------
 $_POST = json_decode(file_get_contents('php://input'), true);
@@ -385,6 +518,10 @@ case 'investmentNcoins':
 
 case 'fundTransfer':
     echo json_encode(transferFund());
+    break;
+
+case 'fundTransferHistory':
+    echo json_encode(getFundTransferHistory());
     break;
 
 default:
