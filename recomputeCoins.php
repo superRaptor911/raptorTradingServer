@@ -55,7 +55,7 @@ var_dump($userInvestmentTable);
 $sql = "DELETE FROM userCoins";
 $result = $conn->query($sql);
 if (!$result) {
-    echo "Error::" . $conn->error;
+    echo "\nError::" . $conn->error;
     exit();
 }
 
@@ -84,7 +84,7 @@ echo "\n\n----Done------\n\n";
 $sql = "DELETE FROM investments";
 $result = $conn->query($sql);
 if (!$result) {
-    echo "Error::" . $conn->error;
+    echo "\nError::" . $conn->error;
     exit();
 }
 
@@ -95,10 +95,44 @@ foreach($userInvestmentTable as $user => $investment) {
     echo "\n\n$sql";
     $result = $conn->query($sql);
     if (!$result) {
-        echo "Error::" . $conn->error;
+        echo "\nError::" . $conn->error;
         exit();
     }
 }
+
+echo "\n\n----Done------\n\n";
+
+$sql = "DELETE FROM wallet";
+$result = $conn->query($sql);
+if (!$result) {
+    echo "Error::" . $conn->error;
+    exit();
+}
+
+foreach($userInvestmentTable as $user => $investment) {
+    $sql = "SELECT * FROM fundTransferHistory WHERE username = '$user'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        echo "\nError::" . $conn->error;
+        exit();
+    }
+
+    if ($result->num_rows == 0) {
+        echo "\nWarning:: No fund transaction history for " . $user;
+        echo "\nCreating new table for " .$user;
+        $sql = "INSERT INTO wallet(username, amount) VALUES('$user', 0)";
+        $result = $conn->query($sql);
+        if (!$result) {
+            echo "\nError::" . $conn->error;
+            exit();
+        }
+    }
+    else {
+        // To be done
+    }
+}
+
+
 
 echo "\n\n----Done------";
 ?>

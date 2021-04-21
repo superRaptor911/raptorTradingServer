@@ -40,10 +40,19 @@ CREATE TABLE wallet (
     amount FLOAT(24),
     FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
 );
+CREATE TABLE fundTransferHistory (
+    username varchar(64),
+    amount FLOAT(24),
+    transType BOOLEAN,
+    fee FLOAT(24),
+    FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 -- RUN THESE TOO
 ALTER TABLE investments MODIFY COLUMN investment FLOAT(24) DEFAULT 0.0;
 ALTER TABLE transactions MODIFY COLUMN cost FLOAT(24);
 ALTER TABLE transactions DROP COLUMN transStatus;
+
+ALTER TABLE transactions ADD COLUMN fee FLOAT(24) DEFAULT 0;
 -----------------------------------------------------------------------------
 -- ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- SHOW CREATE TABLE transactions\G;
