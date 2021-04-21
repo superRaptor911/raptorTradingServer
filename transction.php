@@ -194,6 +194,91 @@ function getInvestmentsPlusCoins() {
     return $return_val;
 }
 
+
+function transferFund() {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+    );
+
+    $hash = $_POST['hash'];
+    if (!verifyUser($hash)) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Permission Denied";
+        return $return_val;
+    }
+
+    if (empty($_POST["username"]) || empty($_POST["amount"]) || !isset($_POST["transtype"])) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Please Fill Fields";
+        return $return_val;
+    }
+
+    $type = $_POST["type"];
+    $username = $_POST["username"];
+    $amount = $_POST["amount"];
+    $transtype = $_POST["transtype"];
+
+    $conn = connectToDB();
+    if (!$conn) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Connection to database failed.";
+        return $return_val;
+    }
+
+    // GET user wallet
+    $sql = "SELECT * FROM wallet WHERE username='$username'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "SQL ERROR: " .$conn->error;
+        return $return_val;
+    }
+    // Check if usr exist?
+    if ($result->num_rows != 1) {
+        $return_val['result'] = false;
+        $return_val['err'] = "ERROR: User not found " .$username;
+        return $return_val;
+    }
+
+    $row = $result->fetch_assoc();
+    $curBalance = $row["amount"];
+    // Low balance check
+    if ($transtype == 0 && ($curBalance - $amount) < 0) {
+        $return_val['result'] = false;
+        $return_val['err'] = "ERROR: INSUFFICIENT FUND";
+        return $return_val;
+    }
+
+    if ($transtype == 0) {
+        $curBalance -= $amount;
+    }
+    elseif ($transtype == 1) {
+        $curBalance += $amount;
+    }
+    else {
+        $return_val['result'] = false;
+        $return_val['err'] = "ERROR: INVALID Trans type";
+        return $return_val;
+    }
+
+    $sql = "UPDATE wallet 
+        SET
+            amount=$curBalance
+        WHERE
+            username='$username'";
+
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "SQL ERROR: " .$conn->error;
+        return $return_val;
+    }
+
+    return $return_val;
+}
+
 // ------------------Execution starts here-----------------
 $_POST = json_decode(file_get_contents('php://input'), true);
 if (empty($_POST["type"])) {
@@ -203,7 +288,7 @@ if (empty($_POST["type"])) {
 $type = $_POST["type"];
 
 switch ($type) {
-    case 'add':
+    case 'addTransaction':
         echo json_encode(addTransaction());
         break;
 
@@ -217,6 +302,10 @@ switch ($type) {
 
     case 'investmentNcoins':
         echo json_encode(getInvestmentsPlusCoins());
+        break;
+
+    case 'fundTransfer':
+        echo json_encode(transferFund());
         break;
 
     default:

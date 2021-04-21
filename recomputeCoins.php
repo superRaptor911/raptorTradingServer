@@ -15,7 +15,6 @@ $userInvestmentTable = array();
 $sql = "SELECT t.*, c.id AS coinId FROM transactions t
     LEFT JOIN
         coins c ON t.coin=c.name
-    WHERE t.transStatus = 1
     GROUP BY t.id";
 
 
