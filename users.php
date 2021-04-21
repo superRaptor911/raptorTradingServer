@@ -58,7 +58,7 @@ function registerUser() {
     $logger->addLog(__FUNCTION__, "Registration success : User $name was created.");
     /* $_POST["email"] = $email; */
     /* sendOTP(); */
-    return $return_val;
+    return createTables($name);
 }
 
 
