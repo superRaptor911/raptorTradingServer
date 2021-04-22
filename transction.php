@@ -66,8 +66,8 @@ function addTransaction() {
         return $return_val;
     }
 
-    $sql = "INSERT INTO transactions(username, coin, coinCount, cost, fee, time)
-        VALUES('$username', '$coinName', '$coinCount', '$coinPrice', $fee, NOW())";
+    $sql = "INSERT INTO transactions(username, coin, coinCount, cost, fee, transType, time)
+        VALUES('$username', '$coinName', '$coinCount', '$coinPrice', $fee, $transtype, NOW())";
 
     if (!$conn->query($sql)) {
         $return_val['result'] = false;
