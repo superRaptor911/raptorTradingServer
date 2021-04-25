@@ -396,9 +396,11 @@ function getInvestmentsPlusCoins() {
     }
 
     // Get Investment data
-    $sql = "SELECT i.*, u.avatar AS userAvatar FROM investments i
+    $sql = "SELECT i.*, u.avatar AS userAvatar, w.amount AS amount FROM investments i
         LEFT JOIN
-        users u ON i.username = u.name ";
+            users u ON i.username = u.name 
+        LEFT JOIN
+            wallet w ON i.username = w.username";
 
     $investments = array();
     $result = $conn->query($sql);
@@ -429,6 +431,7 @@ function getInvestmentsPlusCoins() {
             $username = $row['username'];
             $investment = $investments["$username"]["investment"];
             $userAvatar = $investments["$username"]["userAvatar"];
+            $walletAmount = $investments["$username"]["amount"];
 
             foreach ($row as $key => $count) {
                 if ($key != "username" && $count != 0) {
@@ -440,6 +443,7 @@ function getInvestmentsPlusCoins() {
                 "username" => $username,
                 "userAvatar" => $userAvatar,
                 "investment" => $investment,
+                "amount" => $walletAmount,
                 "coins" => $coins
             );
             array_push($finalData, $data);
