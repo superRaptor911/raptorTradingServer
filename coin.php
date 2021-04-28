@@ -56,6 +56,15 @@ function registerCoin() {
         return $return_val;
     }
 
+    $sql = "ALTER TABLE userCoins ADD COLUMN $coinId INT(6) DEFAULT 0";
+    if (!$conn->query($sql)) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Please select a different coin name, already in use";
+        $logger->addLog(__FUNCTION__, "Registration Failed", '-');
+        $logger->addLog(__FUNCTION__, $conn->error);
+        return $return_val;
+    }
+
     $logger->addLog(__FUNCTION__, "Registration success : User $name was created.");
     /* $_POST["email"] = $email; */
     /* sendOTP(); */
