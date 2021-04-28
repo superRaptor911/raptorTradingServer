@@ -56,7 +56,7 @@ function registerCoin() {
         return $return_val;
     }
 
-    $sql = "ALTER TABLE userCoins ADD COLUMN $coinId INT(6) DEFAULT 0";
+    $sql = "ALTER TABLE userCoins ADD COLUMN $coinId FLOAT(24) DEFAULT 0";
     if (!$conn->query($sql)) {
         $return_val['result'] = false;
         $return_val['err'] = "*Please select a different coin name, already in use";

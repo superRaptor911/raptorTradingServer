@@ -55,13 +55,11 @@ ALTER TABLE investments MODIFY COLUMN investment FLOAT(24) DEFAULT 0.0;
 ALTER TABLE transactions MODIFY COLUMN cost FLOAT(24);
 ALTER TABLE transactions DROP COLUMN transStatus;
 
-ALTER TABLE transactions ADD COLUMN fee FLOAT(24) DEFAULT 0;
-ALTER TABLE transactions DROP COLUMN date;
-ALTER TABLE transactions ADD COLUMN time DATETIME;
-/* ALTER TABLE fundTransferHistory ADD COLUMN time DATETIME; */
-/* ALTER TABLE fundTransferHistory ADD COLUMN externalTransfer BOOLEAN; */
------------------------------------------------------------------------------
+
+ALTER TABLE transactions MODIFY COLUMN coinCount FLOAT(24);
+ALTER TABLE userCoins MODIFY COLUMN dogeinr FLOAT(24);
+ALTER TABLE userCoins MODIFY COLUMN trxinr FLOAT(24);
+ALTER TABLE userCoins MODIFY COLUMN hotinr FLOAT(24);
+
 -- ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- SHOW CREATE TABLE transactions\G;
--- ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_1;
--- ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_2;
