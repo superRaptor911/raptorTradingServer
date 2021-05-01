@@ -138,6 +138,74 @@ function getCoinPrices() {
     return $return_val;
 }
 
+function getCoinHistory() {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+        'history'  => Array()
+    );
+
+    $coin = $_POST["coin"];
+    $period = $_POST["period"];
+    $limit = $_POST["limit"];
+
+    $data = json_decode(file_get_contents("https://x.wazirx.com/api/v2/k?market=$coin&period=$period&limit=$limit"), true);
+
+    $return_val['history'] = $data;
+    return $return_val;
+}
+
+function getCoinInfo() {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+        'info'  => array(),
+        'investors' => array()
+    );
+
+    $coinId = $_POST["coin"];
+
+    $conn = connectToDB();
+    if (!$conn) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Connection to database failed.";
+        return $return_val;
+    }
+
+    $sql = "SELECT c.*, uc.username, uc.$coinId, u.avatar AS userAvatar FROM coins c 
+        LEFT JOIN
+            userCoins uc ON uc.$coinId != 0
+        LEFT JOIN
+            users u ON uc.username = u.name
+        WHERE id = '$coinId'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error failed to get";
+        return $return_val;
+    }
+
+    /* $row = $result->fetch_assoc(); */
+    $flag = false;
+    $investors = array();
+    while ($row = $result->fetch_assoc()) {
+        if (!$flag) {
+            $return_val['info'] = $row;
+            $flag = true;
+        }
+
+        array_push($investors, array(
+            'username' => $row['username'],
+            'count' => $row["$coinId"], 
+            'avatar' => $row['userAvatar']
+        ));
+    }
+    $return_val['investors'] = $investors;
+    return $return_val;
+}
+
 // ------------------Execution starts here-----------------
 $_POST = json_decode(file_get_contents('php://input'), true);
 if (empty($_POST["type"])) {
@@ -147,21 +215,29 @@ if (empty($_POST["type"])) {
 $type = $_POST["type"];
 
 switch ($type) {
-    case 'register':
-        echo json_encode(registerCoin());
-        break;
+case 'register':
+    echo json_encode(registerCoin());
+    break;
 
-    case 'list':
-        echo json_encode(getCoinList());
-        break;
+case 'list':
+    echo json_encode(getCoinList());
+    break;
 
-    case 'prices':
-        echo json_encode(getCoinPrices());
-        break;
+case 'prices':
+    echo json_encode(getCoinPrices());
+    break;
 
-    default:
-        echo json_encode(showInvalidRequest("INVALID_TYPE $type"));
-        break;
+case 'history':
+    echo json_encode(getCoinHistory());
+    break;
+
+case 'info':
+    echo json_encode(getCoinInfo());
+    break;
+
+default:
+    echo json_encode(showInvalidRequest("INVALID_TYPE $type"));
+    break;
 }
 
 ?>

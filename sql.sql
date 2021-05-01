@@ -63,3 +63,10 @@ ALTER TABLE userCoins MODIFY COLUMN hotinr FLOAT(24);
 
 -- ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- SHOW CREATE TABLE transactions\G;
+SELECT c.*, uc.username, uc.dogeinr, u.avatar AS userAvatar FROM coins c 
+LEFT JOIN
+    userCoins uc ON uc.dogeinr != 0
+LEFT JOIN
+    users u ON uc.username = u.name
+WHERE id = 'dogeinr'
+ORDER BY c.name;

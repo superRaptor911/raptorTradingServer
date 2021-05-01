@@ -31,10 +31,32 @@ function getUserCoins() {
         $row = $result->fetch_assoc();
         $keys = array_keys($row);
 
+        $sql = "SELECT * FROM coins";
+        $result = $conn->query($sql);
+        $coins = array();
+        if ($result->num_rows > 0) {
+            while ($rw = $result->fetch_assoc()) {
+                array_push($coins, $rw);
+            }
+        }
+
         $data = array();
         foreach($keys as $key) {
             if ($key != "username" && $row["$key"] > 0) {
-                array_push($data, array("coin" => $key, "count" => $row["$key"]));
+                $coinInfo = array();
+                foreach ($coins as $c => $coin) {
+                    if ($coin["id"] == $key) {
+                        $coinInfo = $coin;
+                        break;
+                    }
+                }
+                array_push($data, array(
+                    "coin" => $key, 
+                    "count" => $row["$key"], 
+                    "coinInfo" => $coinInfo,
+                    "profit" => 0,
+                    "percent" => 0
+                ));
             }
         }
         $return_val['userCoins'] = $data;
