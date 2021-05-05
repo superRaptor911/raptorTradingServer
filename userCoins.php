@@ -79,7 +79,7 @@ function getCoinList() {
         return $return_val;
     }
 
-    $sql = "SELECT * FROM coins";
+    $sql = "SELECT * FROM userCoins";
     $result = $conn->query($sql);
     if (!$result) {
         $return_val['result'] = false;
@@ -95,7 +95,45 @@ function getCoinList() {
     return $return_val;
 }
 
+function getCoinCount() {
+    // Return value
+    $return_val = array(
+        'result' => true, // success
+        'err'    => "",   // err msg
+        'coins'  => Array()
+    );
 
+    $conn = connectToDB();
+    if (!$conn) {
+        $return_val['result'] = false;
+        $return_val['err'] = "*Connection to database failed.";
+        return $return_val;
+    }
+
+    $sql = "SELECT * FROM userCoins";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $return_val['result'] = false;
+        $return_val['err'] = "Error failed to get";
+        return $return_val;
+    }
+    if ($result->num_rows > 0) {
+        $coins = array();
+        while ($row = $result->fetch_assoc()) {
+            foreach ($row as $coin => $value) {
+                if ($coin != "username") {
+                    if (!isset($coins["$coin"])) {
+                        $coins["$coin"] = 0;
+                    }
+                    $coins["$coin"] += $value;
+                }
+            }
+        }
+        $return_val['coins'] = $coins;
+    }
+
+    return $return_val;
+}
 
 // ------------------Execution starts here-----------------
 $_POST = json_decode(file_get_contents('php://input'), true);
@@ -106,17 +144,21 @@ if (empty($_POST["type"])) {
 $type = $_POST["type"];
 
 switch ($type) {
-case 'info':
-    echo json_encode(getUserCoins());
-    break;
+    case 'info':
+        echo json_encode(getUserCoins());
+        break;
 
-case 'list':
-    echo json_encode(getCoinList());
-    break;
+    case 'list':
+        echo json_encode(getCoinList());
+        break;
 
-default:
-    echo json_encode(showInvalidRequest("INVALID_TYPE $type"));
-    break;
+    case 'count':
+        echo json_encode(getCoinCount());
+        break;
+
+    default:
+        echo json_encode(showInvalidRequest("INVALID_TYPE $type"));
+        break;
 }
 
 ?>
