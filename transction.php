@@ -111,6 +111,11 @@ function transferFund() {
     $transtype = $_POST["transtype"];
     $externalTransfer = $_POST["externalTransfer"];
     $fee = $_POST["fee"];
+    $donation = 0;
+
+    if (isset($_POST["donation"])) {
+        $donation = $_POST["donation"];
+    }
 
     $conn = connectToDB();
     if (!$conn) {
@@ -155,16 +160,26 @@ function transferFund() {
         return $return_val;
     }
     // Deduct fees
-    $curBalance -= $fee;
+    $curBalance -= $fee + $donation;
 
     // Add history
-    $sql = "INSERT INTO fundTransferHistory(username, amount, transType, fee, externalTransfer, time)
-        VALUES('$username', $amount, $transtype, $fee, $externalTransfer, NOW())";
+    $sql = "INSERT INTO fundTransferHistory(username, amount, transType, fee, externalTransfer, donation,time)
+        VALUES('$username', $amount, $transtype, $fee, $externalTransfer, $donation, NOW())";
     $result = $conn->query($sql);
     if (!$result) {
         $return_val['result'] = false;
         $return_val['err'] = "SQL ERROR: " .$conn->error;
         return $return_val;
+    }
+
+    if ($donation > 0) {
+        $sql = "INSERT INTO donations(username, amount) VALUES('$username', $donation)";
+        $result = $conn->query($sql);
+        if (!$result) {
+            $return_val['result'] = false;
+            $return_val['err'] = "SQL ERROR: " .$conn->error;
+            return $return_val;
+        }
     }
 
     // Update Wallet
@@ -282,51 +297,20 @@ function getTransactionList() {
         return $return_val;
     }
 
-    $sql = "SELECT t.*, u.avatar AS userAvatar, c.avatar AS coinAvatar, c.id AS coinId FROM transactions t
-        LEFT JOIN
-        users u ON t.username=u.name
-        LEFT JOIN
-        coins c ON t.coin=c.name
-        GROUP BY t.id";
-
-    $result = $conn->query($sql);
-    if (!$result) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Error failed to get";
-        return $return_val;
-    }
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            array_push($return_val['trans'], $row);
+    $condition = "";
+    if (isset($_POST["username"])) {
+        $username = $_POST["username"];
+        if ($username != "") {
+            $condition = "WHERE u.name = '$username'";
         }
     }
 
-    return $return_val;
-}
-
-function getTransactionInfo() {
-    // Return value
-    $return_val = array(
-        'result' => true, // success
-        'err'    => "",   // err msg
-        'trans'  => Array()
-    );
-
-    $username = $_POST["username"];
-
-    $conn = connectToDB();
-    if (!$conn) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Connection to database failed.";
-        return $return_val;
-    }
-
     $sql = "SELECT t.*, u.avatar AS userAvatar, c.avatar AS coinAvatar, c.id AS coinId FROM transactions t
         LEFT JOIN
         users u ON t.username=u.name
         LEFT JOIN
         coins c ON t.coin=c.name
-        WHERE u.name = '$username'
+        $condition
         GROUP BY t.id";
 
     $result = $conn->query($sql);
@@ -462,8 +446,6 @@ function getFundTransferHistory() {
         'history'  => Array()
     );
 
-    $username = $_POST["username"];
-
     $conn = connectToDB();
     if (!$conn) {
         $return_val['result'] = false;
@@ -471,10 +453,19 @@ function getFundTransferHistory() {
         return $return_val;
     }
 
+    $condition = "users u ON u.name = f.username";
+    if (isset($_POST["username"])) {
+        $username = $_POST["username"];
+        if ($username != "") {
+            $condition = "users u ON u.name = '$username' 
+                        WHERE username= '$username'";
+        }
+    }
+
     $sql = "SELECT f.*, u.avatar AS userAvatar FROM fundTransferHistory f
         LEFT JOIN
-        users u ON u.name = '$username'
-        WHERE username= '$username'";
+        $condition
+        ";
 
     $result = $conn->query($sql);
     if (!$result) {
@@ -506,10 +497,6 @@ case 'addTransaction':
 
 case 'list':
     echo json_encode(getTransactionList());
-    break;
-
-case 'info':
-    echo json_encode(getTransactionInfo());
     break;
 
 case 'walletInfo':

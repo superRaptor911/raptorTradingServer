@@ -108,6 +108,7 @@ function getCoinPrices() {
     $return_val = array(
         'result' => true, // success
         'err'    => "",   // err msg
+        'type'   => "live",
         'coins'  => Array()
     );
 
@@ -125,12 +126,24 @@ function getCoinPrices() {
         $return_val['err'] = "Error failed to get";
         return $return_val;
     }
+
     $coins = Array();
-    $coinData = json_decode(file_get_contents("https://api.wazirx.com/api/v2/tickers"), true);
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $coinId = $row['id'];
-            $coins["$coinId"] = $coinData["$coinId"];
+    if (isset($_POST["firstFetch"])) {
+        $coins = json_decode(file_get_contents("prices.json"), true);
+        $return_val["type"] = "cached";
+    }
+    else {
+        $coinData = json_decode(file_get_contents("https://api.wazirx.com/api/v2/tickers"), true);
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $coinId = $row['id'];
+                $coins["$coinId"] = $coinData["$coinId"];
+            }
+        }
+        $file_time = filemtime("prices.json");
+        // Update cache every 5 seconds
+        if (!$file_time || $file_time % 5 == 0) {
+            file_put_contents("prices.json", json_encode($coins));
         }
     }
 
@@ -176,9 +189,9 @@ function getCoinInfo() {
 
     $sql = "SELECT c.*, uc.username, uc.$coinId, u.avatar AS userAvatar FROM coins c 
         LEFT JOIN
-            userCoins uc ON uc.$coinId != 0
+        userCoins uc ON uc.$coinId != 0
         LEFT JOIN
-            users u ON uc.username = u.name
+        users u ON uc.username = u.name
         WHERE id = '$coinId'";
     $result = $conn->query($sql);
     if (!$result) {
