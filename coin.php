@@ -128,7 +128,12 @@ function getCoinPrices() {
     }
 
     $coins = Array();
-    if (isset($_POST["firstFetch"])) {
+
+    $file_time = filemtime("prices.json");
+    $date = new DateTime();
+    $time_now = $date->getTimestamp();
+
+    if (isset($_POST["firstFetch"]) || ($time_now - $file_time) < 3) {
         $coins = json_decode(file_get_contents("prices.json"), true);
         $return_val["type"] = "cached";
     }
@@ -145,9 +150,6 @@ function getCoinPrices() {
                 $coins["$coinId"] = $coinData["$coinId"];
             }
         }
-        $file_time = filemtime("prices.json");
-        $date = new DateTime();
-        $time_now = $date->getTimestamp();
         // Update cache every 5 seconds
         if (!$file_time || ($time_now - $file_time) > 5) {
             file_put_contents("prices.json", json_encode($coins));
