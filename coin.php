@@ -137,14 +137,22 @@ function getCoinPrices() {
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $coinId = $row['id'];
+                if (!$coinData["$coinId"]) {
+                    $return_val['result'] = false;
+                    $return_val['err'] = "Error failed to get";
+                    return $return_val;
+                }
                 $coins["$coinId"] = $coinData["$coinId"];
             }
         }
         $file_time = filemtime("prices.json");
+        $date = new DateTime();
+        $time_now = $date->getTimestamp();
         // Update cache every 5 seconds
-        if (!$file_time || $file_time % 5 == 0) {
+        if (!$file_time || ($time_now - $file_time) > 5) {
             file_put_contents("prices.json", json_encode($coins));
         }
+
     }
 
     $return_val['coins'] = $coins;
