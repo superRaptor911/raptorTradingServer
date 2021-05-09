@@ -133,6 +133,7 @@ function getCoinPrices() {
     $date = new DateTime();
     $time_now = $date->getTimestamp();
 
+    // Use cached results if requested or last cache update time is less than 3 seconds
     if (isset($_POST["firstFetch"]) || ($time_now - $file_time) < 3) {
         $coins = json_decode(file_get_contents("prices.json"), true);
         $return_val["type"] = "cached";
