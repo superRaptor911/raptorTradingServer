@@ -1,6 +1,8 @@
 -- RUN THESE COMMANDS IN UR SQL DB
 create database cucekTrading;
 GRANT ALL PRIVILEGES ON cucekTrading.* TO 'my_fcuking_username'@'localhost';
+CREATE USER 'tempUser'@'localhost' IDENTIFIED BY 'password';
+GRANT SELECT ON cucekTrading.* TO 'tempUser'@'localhost';
 FLUSH PRIVILEGES;
 USE cucekTrading;
 CREATE TABLE users(

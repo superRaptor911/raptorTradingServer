@@ -7,17 +7,19 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +62 sql.sql
-badd +152 coin.php
+badd +64 sql.sql
+badd +96 coin.php
 badd +286 transction.php
 badd +1 userCoins.php
 badd +86 users.php
 badd +49 ~/.config/nvim/UltiSnips/php.snippets
 badd +123 recomputeCoins.php
 badd +28 donations.php
+badd +7 database.php
+badd +35 queryDatabase.php
 argglobal
 %argdel
-edit coin.php
+edit queryDatabase.php
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -27,12 +29,12 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
-let s:l = 151 - ((20 * winheight(0) + 22) / 45)
+let s:l = 36 - ((33 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-151
-normal! 039|
+36
+normal! 05|
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

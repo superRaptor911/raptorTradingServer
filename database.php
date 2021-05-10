@@ -17,6 +17,22 @@ function connectToDB() {
     return $conn;
 }
 
+function readOnlyConnectToDB() {
+    $servername = "localhost";
+    $username = "tempUser";
+    $password = "password";
+    $db = "cucekTrading";
+
+    $conn = new mysqli($servername, $username, $password, $db);
+    // Check connection
+    if ($conn->connect_error) {
+        $logger = new Logger();
+        $logger->addLog(__FUNCTION__, "Connection failed: " . $conn->connect_error);
+        return null;
+    }
+    return $conn;
+}
+
 function showInvalidRequest($msg = "") {
     // Return value
     $return_val = array(
