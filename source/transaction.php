@@ -5,6 +5,10 @@ include('../database.php');
 $DEPOSIT = 1;
 $WITHDRAW = 0;
 
+function buyCoin($username, $coin, $amount, $coinPrice, $fee) {
+
+}
+
 // Funtion to deposit Money
 function depositFund($username, $amount, $donation, $fee) {
     global $DEPOSIT;
@@ -16,6 +20,7 @@ function depositFund($username, $amount, $donation, $fee) {
 
     addFundTransferHistory($username, $amount, $donation, $fee, $DEPOSIT, 1);
     setWalletBalance($username, $$curBalance);
+    updateInvestment($username, $amount);
 
     if ($donation > 0) {
         addDonation($username, $donation);
@@ -38,6 +43,7 @@ function withdrawFund($username, $amount, $donation, $fee) {
 
     addFundTransferHistory($username, $amount, $donation, $fee, $WITHDRAW, 1);
     setWalletBalance($username, $$curBalance);
+    updateInvestment($username, -$amount);
 
     if ($donation > 0) {
         addDonation($username, $donation);
@@ -111,4 +117,16 @@ function addFundTransferHistory($username, $amount, $donation, $fee, $type, $isE
     }
 }
 
+function updateInvestment($username, $change) {
+    $conn = connectToDBEnhanced();
+
+    $sql = "UPDATE investments
+        SET investment = investment + $change 
+        WHERE username = '$username'";
+
+    $result = $conn->query($sql);
+    if (!$result) {
+        throw new Exception(TXT_SqlError($conn));
+    }
+}
 ?>
