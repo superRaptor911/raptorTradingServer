@@ -1,7 +1,6 @@
 <?php
-include('logger.php');
 include('secret.php');
-
+include('messages.php');
 
 function connectToDB() {
     $servername = "localhost";
@@ -12,9 +11,20 @@ function connectToDB() {
     $conn = new mysqli($servername, $username, $password, $db);
     // Check connection
     if ($conn->connect_error) {
-        $logger = new Logger();
-        $logger->addLog(__FUNCTION__, "Connection failed: " . $conn->connect_error);
         return null;
+    }
+    return $conn;
+}
+
+function connectToDBEnhanced($db = "cucekTrading") {
+    $servername = "localhost";
+    $username = getSqlUsername();
+    $password = getSqlPassword();
+
+    $conn = new mysqli($servername, $username, $password, $db);
+    // Check connection
+    if ($conn->connect_error) {
+        throw new Exception(TXT_FailedToConnectDB());
     }
     return $conn;
 }
@@ -28,8 +38,6 @@ function readOnlyConnectToDB() {
     $conn = new mysqli($servername, $username, $password, $db);
     // Check connection
     if ($conn->connect_error) {
-        $logger = new Logger();
-        $logger->addLog(__FUNCTION__, "Connection failed: " . $conn->connect_error);
         return null;
     }
     return $conn;

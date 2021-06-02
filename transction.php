@@ -1,7 +1,6 @@
 <?php
 include('database.php');
 include('utility.php');
-include('messages.php');
 
 // Function to register user
 function addTransaction() {

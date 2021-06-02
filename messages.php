@@ -27,4 +27,11 @@ function MSG_InvalidRequest() {
     return $result;
 }
 
+function TXT_FailedToConnectDB() {
+    return "Could not connect to database";
+}
+
+function TXT_SqlError($conn) {
+    return "SQL ERROR: " . $conn->error;
+}
 ?>
