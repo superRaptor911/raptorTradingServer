@@ -18,4 +18,13 @@ function MSG_FieldsNotSet() {
     return $result;
 }
 
+function MSG_InvalidRequest() {
+    $result = array(
+        'result' => false, 
+        'err'    => "Required Fields not Filled"   
+    );
+
+    return $result;
+}
+
 ?>

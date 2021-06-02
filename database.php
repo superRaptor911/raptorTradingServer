@@ -1,10 +1,12 @@
 <?php
 include('logger.php');
+include('secret.php');
+
 
 function connectToDB() {
     $servername = "localhost";
-    $username = "my_fcuking_username";
-    $password = "my_fcuking_db_password";
+    $username = getSqlUsername();
+    $password = getSqlPassword();
     $db = "cucekTrading";
 
     $conn = new mysqli($servername, $username, $password, $db);
@@ -44,9 +46,9 @@ function showInvalidRequest($msg = "") {
 }
 
 
-// Function to verify user using name and pass
-function verifyUser($hash) {
-    return $hash == "my_fcuking_admin_password";
+// Function to verify admin
+function verifyAdmin($hash) {
+    return $hash == getAdminPassword();
 }
 
 ?>
