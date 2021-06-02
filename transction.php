@@ -1,6 +1,7 @@
 <?php
 include('database.php');
 include('utility.php');
+include('messages.php');
 
 // Function to register user
 function addTransaction() {
@@ -11,24 +12,18 @@ function addTransaction() {
         'pass_err' => ""  // wrong pass err msg
     );
 
+    // Verufy that it's admin
     $hash = $_POST['hash'];
-    if (!verifyUser($hash)) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Permission Denied";
-        return $return_val;
+    if (!verifyAdmin($hash)) {
+        return MSG_AccessDenied();
     }
 
-    // Logger
-    $logger = new Logger();
-
-    if (!isset($_POST["username"]) || !isset($_POST["coinName"]) || !isset($_POST["coinPrice"]) 
-        || !isset($_POST["coinCount"]) || !isset($_POST["fee"]) || !isset($_POST["transtype"]) || !isset($_POST["hash"])) {
-
-        $return_val['result'] = false;
-        $return_val['err'] = "Please Fill Fields";
-        return $return_val;
+    $requiredValues = array("username", "coinName", "coinPrice", "coinCount", "fee", "transtype", "hash");
+    if (!isPostRequredValuesSet($requiredValues)) {
+        return MSG_FieldsNotSet();
     }
 
+    // Get Values
     $username = $_POST["username"];
     $coinName = $_POST["coinName"];
     $coinPrice = $_POST["coinPrice"];
@@ -36,7 +31,8 @@ function addTransaction() {
     $fee = $_POST["fee"];
     $transtype = $_POST["transtype"];
     $hash = $_POST["hash"];
-    
+
+    // In system transfer
     $_POST["externalTransfer"] = 0;
 
     // Switch transfer type 
@@ -72,8 +68,6 @@ function addTransaction() {
     if (!$conn->query($sql)) {
         $return_val['result'] = false;
         $return_val['err'] = "Add transaction failed";
-        $logger->addLog(__FUNCTION__, "Registration Failed", '-');
-        $logger->addLog(__FUNCTION__, $conn->error);
         return $return_val;
     }
 
@@ -86,6 +80,7 @@ function addTransaction() {
 }
 
 
+// Function to Transfer Fund
 function transferFund() {
     // Return value
     $return_val = array(
@@ -94,16 +89,12 @@ function transferFund() {
     );
 
     $hash = $_POST['hash'];
-    if (!verifyUser($hash)) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Permission Denied";
-        return $return_val;
+    if (!verifyAdmin($hash)) {
+        return MSG_AccessDenied();
     }
 
     if (empty($_POST["username"]) || empty($_POST["amount"]) || !isset($_POST["transtype"]) || !isset($_POST["externalTransfer"])) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Please Fill Fields";
-        return $return_val;
+        return MSG_FieldsNotSet();
     }
 
     $username = $_POST["username"];

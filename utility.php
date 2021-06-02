@@ -17,4 +17,13 @@ function sendMail($from, $to, $subject, $message) {
     mail($to,$subject,$message, $headers);
 }
 
+function isPostRequredValuesSet($requiredValues) {
+    foreach ($requiredValues as $value) {
+        if (!isset($_POST["$value"])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 ?>

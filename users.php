@@ -25,7 +25,7 @@ function registerUser() {
     $email = $_POST["email"];
 
     $hash = $_POST['hash'];
-    if (!verifyUser($hash)) {
+    if (!verifyAdmin($hash)) {
         $return_val['result'] = false;
         $return_val['err'] = "Permission Denied";
         return $return_val;
@@ -141,7 +141,7 @@ function authuorizeUser() {
 
     $name = $_POST["name"];
     $hash = $_POST["hash"];
-    $return_val['result'] = verifyUser($name, $hash);
+    $return_val['result'] = verifyAdmin($name, $hash);
     return $return_val;
 }
 
@@ -224,7 +224,7 @@ function updateUser() {
     $email = $_POST["email"];
 
     $hash = $_POST['hash'];
-    if (!verifyUser($hash)) {
+    if (!verifyAdmin($hash)) {
         $return_val['result'] = false;
         $return_val['err'] = "Permission Denied";
         return $return_val;

@@ -61,15 +61,10 @@ CREATE TABLE donations (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- RUN THESE TOO
-ALTER TABLE fundTransferHistory ADD COLUMN donation FLOAT(24) DEFAULT 0.0;
-ALTER TABLE investments DROP COLUMN donation;
-
+CREATE TABLE userAuth (
+    username varchar(64),
+    hash varchar(96),
+    FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 -- ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- SHOW CREATE TABLE transactions\G;
-SELECT c.*, uc.username, uc.dogeinr, u.avatar AS userAvatar FROM coins c 
-LEFT JOIN
-    userCoins uc ON uc.dogeinr != 0
-LEFT JOIN
-    users u ON uc.username = u.name
-WHERE id = 'dogeinr'
-ORDER BY c.name;
