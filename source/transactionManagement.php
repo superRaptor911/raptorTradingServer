@@ -4,6 +4,7 @@ include('../database.php');
 
 $DEPOSIT = 1;
 $WITHDRAW = 0;
+$db = "cucekTrading";
 
 
 // Function to buy coin
@@ -88,7 +89,8 @@ function withdrawFund($username, $amount, $donation, $fee) {
 
 // Function to get wallet Balance
 function getWalletBalance($username) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     // GET user wallet
     $sql = "SELECT * FROM wallet WHERE username='$username'";
@@ -111,7 +113,8 @@ function getWalletBalance($username) {
 
 // Function To set Wallet Balance
 function setWalletBalance($username, $amount) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     // Sql query
     $sql = "UPDATE wallet 
@@ -129,7 +132,8 @@ function setWalletBalance($username, $amount) {
 
 // Function to add donation
 function addDonation($username, $amount) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     $sql = "INSERT INTO donations(username, amount) VALUES('$username', $amount)";
     $result = $conn->query($sql);
@@ -141,7 +145,8 @@ function addDonation($username, $amount) {
 
 // Function to add Fund Transfer history
 function addFundTransferHistory($username, $amount, $donation, $fee, $type, $isExternal) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     $sql = "INSERT INTO fundTransferHistory(username, amount, transType, fee, externalTransfer, donation,time)
         VALUES('$username', $amount, $type, $fee, $isExternal, $donation, NOW())";
@@ -153,7 +158,8 @@ function addFundTransferHistory($username, $amount, $donation, $fee, $type, $isE
 }
 
 function updateInvestment($username, $change) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     $sql = "UPDATE investments
         SET investment = investment + $change 
@@ -167,7 +173,8 @@ function updateInvestment($username, $change) {
 
 // Function To add Coin Transaction History
 function addTransactionHistory($username, $coin, $count, $coinPrice, $fee, $type) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     $sql = "INSERT INTO transactions(username, coin, coinCount, cost, fee, transType, time)
         VALUES('$username', '$coin', '$count', '$coinPrice', $fee, $type, NOW())";
@@ -180,7 +187,8 @@ function addTransactionHistory($username, $coin, $count, $coinPrice, $fee, $type
 
 // Function to get coin count of user
 function getCoinCount($username, $coin) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     $sql = "SELECT uc.*, c.id FROM userCoins uc 
         LEFT JOIN
@@ -212,7 +220,8 @@ function getCoinCount($username, $coin) {
 
 // Function to set coin count of user
 function setCoinCount($username, $coin, $count) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     $coinId = getCoinID($coin);
     // Update coins
@@ -230,7 +239,8 @@ function setCoinCount($username, $coin, $count) {
 
 // Function to get coidID from coin name
 function getCoinID($coin) {
-    $conn = connectToDBEnhanced();
+    global $db;
+    $conn = connectToDBEnhanced($db);
 
     $sql = "SELECT id FROM coins
         WHERE name='$coin'";
