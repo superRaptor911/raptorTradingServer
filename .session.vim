@@ -7,19 +7,24 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +4 sql.sql
+badd +20 sql.sql
 badd +96 coin.php
-badd +286 transction.php
+badd +258 transction.php
 badd +1 userCoins.php
-badd +86 users.php
+badd +68 users.php
 badd +49 ~/.config/nvim/UltiSnips/php.snippets
 badd +123 recomputeCoins.php
 badd +28 donations.php
-badd +20 database.php
+badd +28 database.php
 badd +36 queryDatabase.php
+badd +33 messages.php
+badd +19 utility.php
+badd +1 secret.php
+badd +28 setup.sh
+badd +27 source/transaction.php
 argglobal
 %argdel
-edit transction.php
+edit source/transaction.php
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -29,12 +34,12 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
-let s:l = 383 - ((9 * winheight(0) + 22) / 45)
+let s:l = 27 - ((26 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-383
-normal! 013|
+27
+normal! 0
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
