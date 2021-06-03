@@ -1,6 +1,6 @@
 <?php
 
-include('../database.php');
+include_once('../database.php');
 
 $db = "cucekTrading";
 
@@ -10,11 +10,24 @@ function createUser($username, $email, $avatar) {
     $conn = connectToDBEnhanced($db);
 
     $sql = "INSERT INTO users(name, email, avatar) VALUES('$username', '$email', '$avatar')";
-    $result = $conn->query($sql);
+    executeSql($conn, $sql);
 
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
+    createWallets($username);
+}
+
+
+function createWallets($username) {
+    global $db;
+    $conn = connectToDBEnhanced($db);
+
+    $sql = "INSERT INTO wallet(username, amount) VALUES('$username', 0)";
+    executeSql($conn, $sql);
+
+    $sql = "INSERT INTO userCoins(username) VALUES('$username')";
+    executeSql($conn, $sql);
+
+    $sql = "INSERT INTO investments(username) VALUES('$username')";
+    executeSql($conn, $sql);
 }
 
 

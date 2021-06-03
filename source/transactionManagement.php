@@ -1,6 +1,6 @@
 <?php
 
-include('../database.php');
+include_once('../database.php');
 
 $DEPOSIT = 1;
 $WITHDRAW = 0;
@@ -94,10 +94,7 @@ function getWalletBalance($username) {
 
     // GET user wallet
     $sql = "SELECT * FROM wallet WHERE username='$username'";
-    $result = $conn->query($sql);
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
+    $result = executeSql($conn, $sql);
 
     // Check if usr exist?
     if ($result->num_rows != 1) {
@@ -123,10 +120,7 @@ function setWalletBalance($username, $amount) {
         WHERE
         username='$username'";
 
-    $result = $conn->query($sql);
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
+    executeSql($conn, $sql);
 }
 
 
@@ -136,11 +130,7 @@ function addDonation($username, $amount) {
     $conn = connectToDBEnhanced($db);
 
     $sql = "INSERT INTO donations(username, amount) VALUES('$username', $amount)";
-    $result = $conn->query($sql);
-
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
+    executeSql($conn, $sql);
 }
 
 // Function to add Fund Transfer history
@@ -151,10 +141,7 @@ function addFundTransferHistory($username, $amount, $donation, $fee, $type, $isE
     $sql = "INSERT INTO fundTransferHistory(username, amount, transType, fee, externalTransfer, donation,time)
         VALUES('$username', $amount, $type, $fee, $isExternal, $donation, NOW())";
 
-    $result = $conn->query($sql);
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
+    executeSql($conn, $sql);
 }
 
 function updateInvestment($username, $change) {
@@ -165,10 +152,7 @@ function updateInvestment($username, $change) {
         SET investment = investment + $change 
         WHERE username = '$username'";
 
-    $result = $conn->query($sql);
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
+    executeSql($conn, $sql);
 }
 
 // Function To add Coin Transaction History
@@ -179,10 +163,7 @@ function addTransactionHistory($username, $coin, $count, $coinPrice, $fee, $type
     $sql = "INSERT INTO transactions(username, coin, coinCount, cost, fee, transType, time)
         VALUES('$username', '$coin', '$count', '$coinPrice', $fee, $type, NOW())";
 
-    $result = $conn->query($sql);
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
+    executeSql($conn, $sql);
 }
 
 // Function to get coin count of user
@@ -195,11 +176,7 @@ function getCoinCount($username, $coin) {
             coins c ON c.name = '$coin'
         WHERE uc.username='$username'";
 
-    $result = $conn->query($sql);
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
-
+    $result = executeSql($conn, $sql);
     // Check if usr exist?
     if ($result->num_rows != 1) {
         throw new Exception("Failed to get $username's coin count");
@@ -231,10 +208,7 @@ function setCoinCount($username, $coin, $count) {
         WHERE
             username='$username'";
 
-    $result = $conn->query($sql);
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
+    executeSql($conn, $sql);
 }
 
 // Function to get coidID from coin name
@@ -245,11 +219,7 @@ function getCoinID($coin) {
     $sql = "SELECT id FROM coins
         WHERE name='$coin'";
 
-    $result = $conn->query($sql);
-    if (!$result) {
-        throw new Exception(TXT_SqlError($conn));
-    }
-
+    $result = executeSql($conn, $sql);
     // Check if usr exist?
     if ($result->num_rows != 1) {
         throw new Exception("Failed to get $coin's ID");
@@ -260,5 +230,10 @@ function getCoinID($coin) {
     $coinId = $row['id'];
 
     return $coinId;
+}
+
+function testDB() {
+    global $db;
+    echo $db;
 }
 ?>

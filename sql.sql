@@ -52,13 +52,13 @@ CREATE TABLE fundTransferHistory (
     time DATETIME,
     externalTransfer BOOLEAN,
     FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 CREATE TABLE donations (
     username varchar(64),
     amount FLOAT(24),
     FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 -- RUN THESE TOO
 CREATE TABLE userAuth (

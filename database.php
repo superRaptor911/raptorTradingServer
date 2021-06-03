@@ -54,6 +54,16 @@ function showInvalidRequest($msg = "") {
 }
 
 
+function executeSql($conn, $sql) {
+    $result = $conn->query($sql);
+
+    if (!$result) {
+        throw new Exception(TXT_SqlError($conn));
+    }
+
+    return $result;
+}
+
 // Function to verify admin
 function verifyAdmin($hash) {
     return $hash == getAdminPassword();
