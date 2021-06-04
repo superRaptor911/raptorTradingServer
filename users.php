@@ -8,96 +8,21 @@ function registerUser() {
     $return_val = array(
         'result' => true, // success
         'err'    => "",   // err msg
-        'pass_err' => ""  // wrong pass err msg
     );
-    // Logger
-    $logger = new Logger();
 
-    // Chk all fields are filled
-    if (empty($_POST["name"])) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Please fill data";
-        return $return_val;
-    }
+    verifyAdmin();
+    $requiredValues = array("name", "avatar", "email");
+    checkPostRequiredValues($requiredValues);
 
     $name = $_POST["name"];
     $avatar = $_POST["avatar"];
     $email = $_POST["email"];
 
-    $hash = $_POST['hash'];
-    if (!verifyAdmin($hash)) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Permission Denied";
-        return $return_val;
-    }
-
-    if ($name == false) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*User name should not contain special characters or space.";
-        return $return_val;
-    }
-
-    $conn = connectToDB();
-    if (!$conn) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Connection to database failed.";
-        return $return_val;
-    }
-
-    $sql = "INSERT INTO users(name, avatar, email)
-        VALUES('$name', '$avatar', '$email')";
-
-    if (!$conn->query($sql)) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Please select a different user name or email is already in use";
-        $logger->addLog(__FUNCTION__, "Registration Failed", '-');
-        $logger->addLog(__FUNCTION__, $conn->error);
-        return $return_val;
-    }
-
-    $logger->addLog(__FUNCTION__, "Registration success : User $name was created.");
-    /* $_POST["email"] = $email; */
-    /* sendOTP(); */
-    return createTables($name);
-}
-
-
-function createTables($username) {
-    // Return value
-    $return_val = array(
-        'result' => true, // success
-        'err'    => "",   // err msg
-    );
-
-    $conn = connectToDB();
-    if (!$conn) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Connection to database failed.";
-        return $return_val;
-    }
-
-    $sql = "INSERT INTO wallet(username, amount) VALUES('$username', 0)";
-    if (!$conn->query($sql)) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Error :" . $conn->error;
-        return $return_val;
-    }
-
-    $sql = "INSERT INTO userCoins(username) VALUES('$username')";
-    if (!$conn->query($sql)) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Error :" . $conn->error;
-        return $return_val;
-    }
-
-    $sql = "INSERT INTO investments(username) VALUES('$username')";
-    if (!$conn->query($sql)) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Error :" . $conn->error;
-        return $return_val;
-    }
+    createUser($name, $email, $avatar);
     return $return_val;
 }
+
+
 
 function getUserInfo() {
     // Return value
@@ -128,20 +53,6 @@ function getUserInfo() {
         $row = $result->fetch_assoc();
         $return_val['userInfo'] = $row;
     }
-    return $return_val;
-}
-
-// Function to verify user using name and pass
-function authuorizeUser() {
-    // Return value
-    $return_val = array(
-        'result' => true, // success
-        'err'    => ""   // err msg
-    );
-
-    $name = $_POST["name"];
-    $hash = $_POST["hash"];
-    $return_val['result'] = verifyAdmin($name, $hash);
     return $return_val;
 }
 
@@ -188,20 +99,10 @@ function getUserList() {
         'users'  => Array()
     );
 
-    $conn = connectToDB();
-    if (!$conn) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Connection to database failed.";
-        return $return_val;
-    }
+    $conn = connectToDBEnhanced();
 
     $sql = "SELECT * FROM users";
-    $result = $conn->query($sql);
-    if (!$result) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Failed to get user list";
-        return $return_val;
-    }
+    $result = executeSql($conn, $sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
            array_push($return_val['users'], $row);
@@ -272,10 +173,6 @@ case 'register':
 
 case 'info':
     echo json_encode(getUserInfo());
-    break;
-
-case 'auth':
-    echo json_encode(authuorizeUser());
     break;
 
 case 'list':
