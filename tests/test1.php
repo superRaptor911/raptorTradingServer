@@ -1,14 +1,14 @@
 <?php
 
-include('../source/transactionManagement.php');
-include('../source/userManagement.php');
+include_once('../source/transactionManagement.php');
+include_once('../source/userManagement.php');
+include_once('../source/coinManagement.php');
 
-$GLOBALS["db"] = "testDB";
+$GLOBALS["database"] = "testDB";
 
 
 function cleanup() {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $tables = array(
         "users",
@@ -23,18 +23,22 @@ function cleanup() {
 
     foreach ($tables as $table) {
         $sql = "delete from $table";
-
-        $result = $conn->query($sql);
-        if (!$result) {
-            throw new Exception(TXT_SqlError($conn));
-        }
+        executeSql($conn, $sql);
     }
+
+    $sql = "DROP TABLE userCoins";
+    executeSql($conn, $sql);
+
+    $sql = " CREATE TABLE userCoins (
+            username varchar(64),
+            FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE)";
+
+    executeSql($conn, $sql);
 }
 
 function displayTable($table) {
     echo "\nDisplaying $table\n";
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $sql = "select * from $table";
     $result = $conn->query($sql);
@@ -69,16 +73,36 @@ function test1() {
     displayTable("wallet");
     displayTable("fundTransferHistory");
 
-    echo "Test 1 complete cleaning up\n";
+    echo "-------------------Test 1 complete cleaning up\n";
     cleanup();
 }
 
+function test2() {
+    echo "Starting Test 2\n";
+    createUser("Raptor", "Mp5 asas", "exess");
 
+    addCoin("BITCOIN", "bit", "akaskhdkhad");
+    addCoin("ether", "eth", "adsaddkaskhdkhad");
+    addCoin("raptonium", "rpt", "akhad");
+
+    depositFund("Raptor", 500, 0, 0);
+    buyCoin("Raptor", "BITCOIN", 0.1, 500, 10); // 60
+    buyCoin("Raptor", "BITCOIN", 0.2, 500, 10); // 110 + 60
+    buyCoin("Raptor", "ether", 2, 50, 0); // 110 + 60 + 100
+    sellCoin("Raptor", "ether", 1, 100, 10); // 110 + 60 + 100 -90
+
+    withdrawFund("Raptor", 300, 10, 5);
+
+    displayTable("transactions");
+    displayTable("userCoins");
+    displayTable("wallet");
+}
 
 
 function mainFunc() {
     cleanup();
     test1();
+    test2();
 }
 
 mainFunc();

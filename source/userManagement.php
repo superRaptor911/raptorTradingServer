@@ -6,8 +6,7 @@ $db = "cucekTrading";
 
 // Function To create user
 function createUser($username, $email, $avatar) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $sql = "INSERT INTO users(name, email, avatar) VALUES('$username', '$email', '$avatar')";
     executeSql($conn, $sql);
@@ -17,8 +16,7 @@ function createUser($username, $email, $avatar) {
 
 
 function createWallets($username) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $sql = "INSERT INTO wallet(username, amount) VALUES('$username', 0)";
     executeSql($conn, $sql);

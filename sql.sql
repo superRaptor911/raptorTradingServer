@@ -29,8 +29,6 @@ CREATE TABLE transactions (
 );
 CREATE TABLE userCoins (
     username varchar(64),
-    dogeinr FLOAT(24) DEFAULT 0,
-    trxinr FLOAT(24) DEFAULT 0,
     FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE investments(

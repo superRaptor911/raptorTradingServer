@@ -16,10 +16,16 @@ function connectToDB() {
     return $conn;
 }
 
-function connectToDBEnhanced($db) {
+function connectToDBEnhanced() {
+    global $database;
     $servername = "localhost";
     $username = getSqlUsername();
     $password = getSqlPassword();
+    $db = $database;
+
+    if (empty($db)) {
+        throw new Exception("DB not set");
+    }
 
     $conn = new mysqli($servername, $username, $password, $db);
     // Check connection

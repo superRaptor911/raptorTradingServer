@@ -5,7 +5,6 @@ include_once('coinManagement.php');
 
 $DEPOSIT = 1;
 $WITHDRAW = 0;
-$db = "cucekTrading";
 
 
 // Function to buy coin
@@ -35,7 +34,7 @@ function sellCoin($username, $coin, $count, $coinPrice, $fee) {
     $coinBalance = getCoinCount($username, $coin);
 
     $curBalance = $balance + $netAmount;
-    $curCoinBalance = $coinBalance + $count;
+    $curCoinBalance = $coinBalance - $count;
     if ($curCoinBalance < 0) {
         throw new Exception("INSUFFICIENT COINS");
     }
@@ -90,8 +89,7 @@ function withdrawFund($username, $amount, $donation, $fee) {
 
 // Function to get wallet Balance
 function getWalletBalance($username) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     // GET user wallet
     $sql = "SELECT * FROM wallet WHERE username='$username'";
@@ -111,8 +109,7 @@ function getWalletBalance($username) {
 
 // Function To set Wallet Balance
 function setWalletBalance($username, $amount) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     // Sql query
     $sql = "UPDATE wallet 
@@ -127,8 +124,7 @@ function setWalletBalance($username, $amount) {
 
 // Function to add donation
 function addDonation($username, $amount) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $sql = "INSERT INTO donations(username, amount) VALUES('$username', $amount)";
     executeSql($conn, $sql);
@@ -136,8 +132,7 @@ function addDonation($username, $amount) {
 
 // Function to add Fund Transfer history
 function addFundTransferHistory($username, $amount, $donation, $fee, $type, $isExternal) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $sql = "INSERT INTO fundTransferHistory(username, amount, transType, fee, externalTransfer, donation,time)
         VALUES('$username', $amount, $type, $fee, $isExternal, $donation, NOW())";
@@ -146,8 +141,7 @@ function addFundTransferHistory($username, $amount, $donation, $fee, $type, $isE
 }
 
 function updateInvestment($username, $change) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $sql = "UPDATE investments
         SET investment = investment + $change 
@@ -158,8 +152,7 @@ function updateInvestment($username, $change) {
 
 // Function To add Coin Transaction History
 function addTransactionHistory($username, $coin, $count, $coinPrice, $fee, $type) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $sql = "INSERT INTO transactions(username, coin, coinCount, cost, fee, transType, time)
         VALUES('$username', '$coin', '$count', '$coinPrice', $fee, $type, NOW())";
@@ -169,8 +162,7 @@ function addTransactionHistory($username, $coin, $count, $coinPrice, $fee, $type
 
 // Function to get coin count of user
 function getCoinCount($username, $coin) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $sql = "SELECT uc.*, c.id FROM userCoins uc 
         LEFT JOIN
@@ -198,8 +190,7 @@ function getCoinCount($username, $coin) {
 
 // Function to set coin count of user
 function setCoinCount($username, $coin, $count) {
-    global $db;
-    $conn = connectToDBEnhanced($db);
+    $conn = connectToDBEnhanced();
 
     $coinId = getCoinID($coin);
     // Update coins
@@ -212,9 +203,4 @@ function setCoinCount($username, $coin, $count) {
     executeSql($conn, $sql);
 }
 
-
-function testDB() {
-    global $db;
-    echo $db;
-}
 ?>
