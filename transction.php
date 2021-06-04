@@ -1,6 +1,7 @@
 <?php
-include('database.php');
-include('utility.php');
+include_once('database.php');
+include_once('utility.php');
+include("source/transactionManagement.php");
 
 // Function to register user
 function addTransaction() {
@@ -257,7 +258,7 @@ case 'fundTransferHistory':
     break;
 
 default:
-    echo json_encode(showInvalidRequest("INVALID_TYPE $type"));
+    echo json_encode(MSG_InvalidRequest());
     break;
 }
 

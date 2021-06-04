@@ -1,6 +1,7 @@
 <?php
-include('database.php');
-include('utility.php');
+
+include("source/userManagement.php");
+include_once('utility.php');
 
 // Function to register user
 function registerUser() {
@@ -184,7 +185,7 @@ case 'update':
     break;
 
 default:
-    echo json_encode(showInvalidRequest("INVALID_TYPE $type"));
+    echo json_encode(MSG_InvalidRequest());
     break;
 }
 

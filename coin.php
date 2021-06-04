@@ -177,7 +177,7 @@ case 'info':
     break;
 
 default:
-    echo json_encode(showInvalidRequest("INVALID_TYPE $type"));
+    echo json_encode(MSG_InvalidRequest());
     break;
 }
 

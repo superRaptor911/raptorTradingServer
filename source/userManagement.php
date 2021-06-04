@@ -1,6 +1,6 @@
 <?php
 
-include_once('../database.php');
+include_once(dirname(__FILE__) .'/../database.php');
 
 $db = "cucekTrading";
 
