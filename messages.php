@@ -34,4 +34,8 @@ function TXT_FailedToConnectDB() {
 function TXT_SqlError($conn) {
     return "SQL ERROR: " . $conn->error;
 }
+
+function TXT_AccessDenied() {
+    return "INVALID KEY. ACCESS DENIED";
+}
 ?>

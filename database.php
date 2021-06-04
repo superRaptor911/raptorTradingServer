@@ -1,6 +1,8 @@
 <?php
-include('secret.php');
-include('messages.php');
+include_once('secret.php');
+include_once('messages.php');
+
+$GLOBALS["database"] = "cucekTrading";
 
 function connectToDB() {
     $servername = "localhost";
@@ -71,8 +73,23 @@ function executeSql($conn, $sql) {
 }
 
 // Function to verify admin
-function verifyAdmin($hash) {
-    return $hash == getAdminPassword();
+function verifyAdmin() {
+    $hash = $_POST["hash"];
+    if ($hash != getAdminPassword()) {
+        throw new Exception(TXT_AccessDenied());
+    }
 }
 
+// Exception handler
+function topLevelExceptionHandler($exception) {
+    // Return value
+    $return_val = array(
+        'result' => false, 
+        'err'    => $exception->getMessage()
+    );
+
+    echo json_encode($return_val);
+}
+
+set_exception_handler('topLevelExceptionHandler');
 ?>

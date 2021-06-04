@@ -17,13 +17,12 @@ function sendMail($from, $to, $subject, $message) {
     mail($to,$subject,$message, $headers);
 }
 
-function isPostRequredValuesSet($requiredValues) {
+function checkPostRequiredValues($requiredValues) {
     foreach ($requiredValues as $value) {
         if (!isset($_POST["$value"])) {
-            return false;
+            throw new Exception("Error: $value is not set");
         }
     }
-    return true;
 }
 
 ?>
