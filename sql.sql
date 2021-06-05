@@ -65,5 +65,7 @@ CREATE TABLE userAuth (
     FOREIGN KEY (username) REFERENCES users(name) ON DELETE CASCADE ON UPDATE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ALTER TABLE transactions ADD COLUMN note VARCHAR(196) DEFAULT "";
+
+DELETE FROM fundTransferHistory WHERE externalTransfer=0;
 -- ALTER DATABASE cucekTrading CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- SHOW CREATE TABLE transactions\G;
