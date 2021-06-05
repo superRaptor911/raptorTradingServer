@@ -75,11 +75,11 @@ function getCoinPrices() {
             while ($row = $result->fetch_assoc()) {
                 $coinId = $row['id'];
                 if (!$coinData["$coinId"]) {
-                    $return_val['result'] = false;
-                    $return_val['err'] = "Error failed to get";
-                    return $return_val;
+                    $coins["$coinId"] = 0;
                 }
-                $coins["$coinId"] = $coinData["$coinId"];
+                else {
+                    $coins["$coinId"] = $coinData["$coinId"];
+                }
             }
         }
         // Update cache every 5 seconds

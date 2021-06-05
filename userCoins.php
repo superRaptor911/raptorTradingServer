@@ -9,24 +9,12 @@ function getUserCoins() {
         'err'    => "",   // err msg
         'userCoins'  => array()
     );
-    if (empty($_POST["name"])) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*name not set";
-        return $return_val;
-    }
-    $name = $_POST["name"];
 
-    $conn = connectToDB();
-    if (!$conn) {
-        $logger = new Logger();
-        $logger->addLog(__FUNCTION__, "*Connection to database failed.");
-        $return_val['result'] = false;
-        $return_val['err'] = "*Connection to database failed.";
-        return $return_val;
-    }
+    $name = $_POST["name"];
+    $conn = connectToDBEnhanced();
     // SQL DB
     $sql = "SELECT * FROM userCoins WHERE username='$name'";
-    $result = $conn->query($sql);
+    $result = executeSql($conn, $sql);
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $keys = array_keys($row);
@@ -72,20 +60,10 @@ function getCoinList() {
         'coins'  => Array()
     );
 
-    $conn = connectToDB();
-    if (!$conn) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Connection to database failed.";
-        return $return_val;
-    }
+    $conn = connectToDBEnhanced();
 
     $sql = "SELECT * FROM userCoins";
-    $result = $conn->query($sql);
-    if (!$result) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Error failed to get";
-        return $return_val;
-    }
+    $result = executeSql($conn, $sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             array_push($return_val['coins'], $row);
@@ -103,20 +81,10 @@ function getCoinCount() {
         'coins'  => Array()
     );
 
-    $conn = connectToDB();
-    if (!$conn) {
-        $return_val['result'] = false;
-        $return_val['err'] = "*Connection to database failed.";
-        return $return_val;
-    }
+    $conn = connectToDBEnhanced();
 
     $sql = "SELECT * FROM userCoins";
-    $result = $conn->query($sql);
-    if (!$result) {
-        $return_val['result'] = false;
-        $return_val['err'] = "Error failed to get";
-        return $return_val;
-    }
+    $result = executeSql($conn, $sql);
     if ($result->num_rows > 0) {
         $coins = array();
         while ($row = $result->fetch_assoc()) {
